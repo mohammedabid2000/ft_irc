@@ -1,32 +1,28 @@
-#include <iostream>
-#include <poll.h>
-#include <unistd.h>
+#include "../inc/Server.hpp"
+#include <cstdlib>
 
-int main()
+int main(int ac, char **av)
 {
-    pollfd fds[1];
-
-    // stdin = keyboard input
-    fds[0].fd = 0;
-
-    // watch for input
-    fds[0].events = POLLIN;
-
-    while (true)
+    if (ac != 3)
     {
-        std::cout << "waiting...\n";
-
-        int ret = poll(fds, 1, -1);
-
-        if (fds[0].revents & POLLIN)
-        {
-            std::string line;
-
-            std::getline(std::cin, line);
-
-            std::cout << "you typed: "
-                      << line
-                      << std::endl;
-        }
+        std::cerr << "Usage: ./ircserv <port> <password>\n";
+        return 1;
     }
+
+    int port = std::atoi(av[1]);
+    std::string password = av[2];
+
+    try
+    {
+        Server server(port, password);
+        server.initSocket();
+        server.bindSocket();
+        server.startListening();
+        server.run();
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    return 0;
 }
