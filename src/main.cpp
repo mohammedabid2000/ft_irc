@@ -11,18 +11,10 @@ int main(int ac, char **av)
 
     int port = std::atoi(av[1]);
     std::string password = av[2];
-
-    try
-    {
-        Server server(port, password);
-        server.initSocket();
-        server.bindSocket();
-        server.startListening();
-        server.run();
-    }
-    catch (std::exception &e)
-    {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
+    Server server(port, password);
+    server.initSocket();
+    server.bindSocket();
+    server.startListening();
+    server.run();
     return 0;
 }

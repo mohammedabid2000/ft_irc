@@ -12,6 +12,9 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <errno.h>
+#include "CommandHandler.hpp"
+#include <netdb.h>
+class CommandHandler;
 class Server
 {
     private:
@@ -20,10 +23,16 @@ class Server
         int _serverfd;
         std::vector<pollfd> _fds;
         std::vector<Client> _clients;
+        Parser _parsed;
+        CommandHandler _handler;
+        Client* findClient(int fd);
+        void processBuffer(Client& client);
     public:
         Server(int port, std::string pass);
         ~Server();
-        Client* findClient(int fd);
+        const std::string& getPass()const{return _pass;}
+        void sendMessage(int fd, const std::string& msg);
+        bool isNickTaken(std::string& wanted);
         void initSocket();        // socket + setsockopt
         void bindSocket();        // bind()
         void startListening();    // listen()

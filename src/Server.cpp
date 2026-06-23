@@ -1,5 +1,4 @@
 #include "../inc/Server.hpp"
-
 Server::Server(int port, std::string pass):_port(port),_pass(pass)
 {
     std::cout << "IRC server created\n";
@@ -12,9 +11,12 @@ Server::~Server()
 
 void    Server::initSocket()
 {
-    _serverfd  = socket(AF_INET, SOCK_STREAM, 0);
+    _serverfd  = socket(PF_INET, SOCK_STREAM, getprotobyname("tcp")->p_proto);
     if(_serverfd < 0)
-        throw "Socket creation failed !\n";
+    {
+        std::cerr << "Socket creation failed !\n";
+        return;
+    }
     int yes = 1;
     setsockopt(_serverfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
     fcntl(_serverfd, F_SETFL, O_NONBLOCK);
@@ -27,7 +29,10 @@ void    Server::bindSocket()
     addr.sin_port = htons(_port);
     addr.sin_addr.s_addr = INADDR_ANY;
     if (bind(_serverfd,(const sockaddr*)&addr, sizeof(addr)) != 0)
-        throw "Socket binding failed !\n";
+    {
+        std::cerr << "Socket binding failed !\n";
+        return;
+    }
 }
 void Server::startListening()
 {
@@ -37,7 +42,10 @@ void Server::acceptClient()
 {
     int c_fd = accept(_serverfd, NULL, NULL);
     if (c_fd < 0)
-        throw "Accept failure !\n";
+    {
+        std::cerr << "Accept failure !\n";
+        return;
+    }
     fcntl(c_fd, F_SETFL, O_NONBLOCK);
     Client client(c_fd);
     _clients.push_back(client);
@@ -45,8 +53,9 @@ void Server::acceptClient()
     clientPoll.fd = c_fd;
     clientPoll.events = POLLIN;
     _fds.push_back(clientPoll);
-    std::cout << "new client connected\n";
+    std::cout << "ACCEPT fd = " << c_fd << std::endl;
 }
+
 Client* Server::findClient(int fd)
 {
     for (size_t i = 0; i < _clients.size(); i++)
@@ -75,9 +84,12 @@ void Server::receiveData(int fd)
         return;
     }
     buffer[bytes] = '\0';
-    std::cout << "received from " << fd << ": " << buffer << std::endl; 
+    std::cout << "RECEIVED from " << fd << ": " << buffer << std::endl; 
     Client *client = findClient(fd);
+    if(!client)
+        return; // protecting the segfault am7aynk
     client->appendBuffer(buffer);
+    processBuffer(*client);
 
 }
     
@@ -108,6 +120,7 @@ void Server::removeClient(int fd)
     close(fd);
     removePollFd(fd);
     removeClientObject(fd);
+    std::cout << "REMOVE fd = " << fd << std::endl;
 }
 void Server::run()
 {
@@ -129,4 +142,32 @@ void Server::run()
             }
         }
     }
+}
+void Server::processBuffer(Client& client)
+{
+    std::string& buf = client.getBuffer();
+
+    size_t pos;
+
+    while ((pos = buf.find("\n")) != std::string::npos)// should be \r\n for IRC \n for terminal testing
+    {
+        std::string command;
+        command = buf.substr(0, pos); 
+        buf.erase(0, pos + 1);
+        ParsedCommand cmd = _parsed.parse(command);
+        _handler.execute(*this, client, cmd); 
+    }
+}
+void Server::sendMessage(int fd, const std::string& msg)
+{
+    send(fd, msg.c_str(), msg.size(), 0);
+}
+bool Server::isNickTaken(std::string& wanted)
+{
+    for (size_t i = 0; i < _clients.size(); i++)
+    {
+        if(wanted == _clients[i].getNickname())
+            return true;
+    }
+    return false;
 }
