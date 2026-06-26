@@ -7,6 +7,7 @@ void CommandHandler::handlePass(Server& server,
                                const ParsedCommand& cmd)
 {
     // 1. already registered
+    std::cout << "PASS handler called\n";
     if (client.isRegistered())
     {
         server.sendMessage(
@@ -60,6 +61,9 @@ void CommandHandler::handleNick(Server& server,
         return;
     }
 
+    std::cout << "Entered NICK handler\n";
+    if (!cmd.params.empty())
+        std::cout << "Nick = [" << cmd.params[0] << "]\n";
     std::string nick = cmd.params[0];
     if (!isValidNickname(nick))
     {
@@ -147,6 +151,7 @@ void CommandHandler::tryRegister(Server& server, Client& client)
 }
 void CommandHandler::execute(Server& server,Client& client,  const ParsedCommand& cmd)
 {
+    std::cout << "Command = [" << cmd.command << "]\n";
     if (cmd.command == "PASS")
         handlePass(server, client, cmd);
 
@@ -155,7 +160,6 @@ void CommandHandler::execute(Server& server,Client& client,  const ParsedCommand
 
     else if (cmd.command == "USER")
         handleUser(server,client, cmd);
-
     else
         std::cout << "Unknown command: "
                   << cmd.command

@@ -84,7 +84,10 @@ void Server::receiveData(int fd)
         return;
     }
     buffer[bytes] = '\0';
-    std::cout << "RECEIVED from " << fd << ": " << buffer << std::endl; 
+    std::cout << "RECEIVED " << bytes << " bytes: ";
+    for (int i = 0; i < bytes; i++)
+        std::cout << "[" << (int)(unsigned char)buffer[i] << "]";
+    std::cout << std::endl;
     Client *client = findClient(fd);
     if(!client)
         return; // protecting the segfault am7aynk
@@ -149,11 +152,11 @@ void Server::processBuffer(Client& client)
 
     size_t pos;
 
-    while ((pos = buf.find("\n")) != std::string::npos)// should be \r\n for IRC \n for terminal testing
+    while ((pos = buf.find("\r\n")) != std::string::npos)// should be \r\n for IRC \n for terminal testing
     {
         std::string command;
         command = buf.substr(0, pos); 
-        buf.erase(0, pos + 1);
+        buf.erase(0, pos + 2);
         ParsedCommand cmd = _parsed.parse(command);
         _handler.execute(*this, client, cmd); 
     }
