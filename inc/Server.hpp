@@ -46,6 +46,7 @@ class Server
         void run();              // main loop
         Channel*    findChannel(const std::string& name);
         Channel*    createChannel(const std::string& name);
+        Client*     findClientByNick(const std::string& nickname);
 };
 
 #endif

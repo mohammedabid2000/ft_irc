@@ -198,7 +198,10 @@ void    CommandHandler::handleJoin(Server& server, Client& client, const ParsedC
     std::cout << client.getNickname() << " joined " << channel->getName() << std::endl;
     std::cout << "Users in channel: " << channel->getUserCount() << std::endl;
 }
-void CommandHandler::handlePrivmsg(Server& server, Client& client, const ParsedCommand& cmd)
+
+void CommandHandler::handlePrivmsg(Server& server,
+                                   Client& client,
+                                   const ParsedCommand& cmd)
 {
     if (cmd.params.size() < 2)
     {
@@ -209,26 +212,48 @@ void CommandHandler::handlePrivmsg(Server& server, Client& client, const ParsedC
     std::string target = cmd.params[0];
     std::string message = cmd.params[1];
 
-    Channel* channel = server.findChannel(target);
-    if (!channel)
+    if (target[0] == '#')
     {
-        server.sendMessage(client.getFd(), "No such channel\r\n");
-        return;
-    }
+        Channel* channel = server.findChannel(target);
 
-    if (!channel->hasUser(&client))
-    {
-        server.sendMessage(client.getFd(), "You are not in this channel\r\n");
-        return;
-    }
-
-    const std::vector<Client*>& users = channel->getUsers();
-
-    for (size_t i = 0; i < users.size(); i++)
-    {
-        if (users[i] != &client)
+        if (!channel)
         {
-            server.sendMessage(users[i]->getFd(),":" + client.getNickname() + " PRIVMSG " + target + " :" + message + "\r\n");
+            server.sendMessage(client.getFd(), "No such channel\r\n");
+            return;
         }
+
+        if (!channel->hasUser(&client))
+        {
+            server.sendMessage(client.getFd(), "You are not in this channel\r\n");
+            return;
+        }
+
+        const std::vector<Client*>& users = channel->getUsers();
+
+        for (size_t i = 0; i < users.size(); i++)
+        {
+            if (users[i] != &client)
+            {
+                server.sendMessage(
+                    users[i]->getFd(),
+                    ":" + client.getNickname() + " PRIVMSG " + target + " :" + message + "\r\n"
+                );
+            }
+        }
+    }
+    else
+    {
+        Client* receiver = server.findClientByNick(target);
+
+        if (!receiver)
+        {
+            server.sendMessage(client.getFd(), "No such nick\r\n");
+            return;
+        }
+
+        server.sendMessage(
+            receiver->getFd(),
+            ":" + client.getNickname() + " PRIVMSG " + target + " :" + message + "\r\n"
+        );
     }
 }

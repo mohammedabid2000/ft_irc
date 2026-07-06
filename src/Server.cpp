@@ -187,3 +187,13 @@ Channel*    Server::createChannel(const std::string& name)
     _channels.push_back(Channel(name));
     return &_channels.back();
 }
+
+Client*     Server::findClientByNick(const std::string& nickname)
+{
+    for(size_t i = 0; i < _clients.size(); i++)
+    {
+        if(_clients[i].getNickname() == nickname)
+            return &_clients[i];
+    }
+    return NULL;
+}
