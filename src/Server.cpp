@@ -171,3 +171,19 @@ bool Server::isNickTaken(std::string& wanted)
     }
     return false;
 }
+
+Channel*    Server::findChannel(const std::string& name)
+{
+    for(size_t i = 0; i < _channels.size(); i++)
+    {
+        if(_channels[i].getName() == name)
+            return &_channels[i];
+    }
+    return NULL;
+}
+
+Channel*    Server::createChannel(const std::string& name)
+{
+    _channels.push_back(Channel(name));
+    return &_channels.back();
+}

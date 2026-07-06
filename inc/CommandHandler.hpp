@@ -11,6 +11,9 @@ class CommandHandler
         void handlePass(Server& server, Client& client, const ParsedCommand& cmd);
         void handleNick(Server& server,Client& client, const ParsedCommand& cmd);
         void handleUser(Server& server, Client& client, const ParsedCommand& cmd);
+        void handleJoin(Server& server, Client& client, const ParsedCommand& cmd);
         void tryRegister(Server& server,Client& client);
+        void handlePrivmsg(Server& server, Client& client, const ParsedCommand& cmd);
+        
 };
 #endif

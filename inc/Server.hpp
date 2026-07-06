@@ -14,6 +14,7 @@
 #include <errno.h>
 #include "CommandHandler.hpp"
 #include <netdb.h>
+#include "Channel.hpp"
 class CommandHandler;
 class Server
 {
@@ -22,7 +23,8 @@ class Server
         std::string _pass;
         int _serverfd;
         std::vector<pollfd> _fds;
-        std::vector<Client> _clients;
+        std::vector<Client> _clients; //stores all clients
+        std::vector<Channel> _channels; // to store all channels
         Parser _parsed;
         CommandHandler _handler;
         Client* findClient(int fd);
@@ -42,6 +44,8 @@ class Server
         void removePollFd(int fd);         // remove from _fds
         void removeClientObject(int fd);   // remove from _clients
         void run();              // main loop
+        Channel*    findChannel(const std::string& name);
+        Channel*    createChannel(const std::string& name);
 };
 
 #endif

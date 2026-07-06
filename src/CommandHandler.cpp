@@ -46,7 +46,7 @@ void CommandHandler::handlePass(Server& server,
         return;
     }
 
-    server.sendMessage(client.getFd(),"Password accepeted\r\n");
+    // server.sendMessage(client.getFd(),"Password accepeted\r\n");
         
     client.setPassAccepted(true);
 }
@@ -86,7 +86,7 @@ void CommandHandler::handleNick(Server& server,
 
         server.sendMessage(client.getFd(), msg);
     }
-    server.sendMessage(client.getFd(),"Nickname set\r\n");
+    // server.sendMessage(client.getFd(),"Nickname set\r\n");
     tryRegister(server, client);
 }
 void CommandHandler::handleUser(Server& server,
@@ -120,7 +120,7 @@ void CommandHandler::handleUser(Server& server,
     std::cout << "Username: " << client.getUsername() << "Realname: "<< client.getRealname() << std::endl;
     // 4. attempt registration
     tryRegister(server,client);
-    server.sendMessage(client.getFd(),"User and real name set\r\n");
+    // server.sendMessage(client.getFd(),"User and real name set\r\n");
 }
 void CommandHandler::tryRegister(Server& server, Client& client)
 {
@@ -155,9 +155,80 @@ void CommandHandler::execute(Server& server,Client& client,  const ParsedCommand
 
     else if (cmd.command == "USER")
         handleUser(server,client, cmd);
-
+    
+    else if(cmd.command == "JOIN")
+        handleJoin(server, client, cmd);
+    
+    else if(cmd.command == "PRIVMSG")
+        handlePrivmsg(server, client, cmd);
+        
     else
         std::cout << "Unknown command: "
                   << cmd.command
                   << std::endl;
+}
+
+void    CommandHandler::handleJoin(Server& server, Client& client, const ParsedCommand& cmd)
+{
+    (void)client;
+
+    if(cmd.params.empty())
+    {
+        std::cout << "JOIN: missing channel name" << std::endl;
+        return;
+    }
+    std::string channelName = cmd.params[0];
+    Channel* channel = server.findChannel(channelName);
+    if(!channel)
+    {
+        channel = server.createChannel(channelName);
+        std::cout << "Channel created: " << channel->getName() << std::endl;
+    }
+    else
+    {
+        std::cout << "Channel exists: " << channel->getName() << std::endl;
+    }
+    if(channel->hasUser(&client))
+    {
+        server.sendMessage(client.getFd(), "You aare already in " + channel->getName() + "\r\n");
+        return;
+    }
+    channel->addUser(&client);
+    server.sendMessage(client.getFd(), "Joined " + channel->getName() + "\r\n");
+    std::cout << client.getNickname() << " joined " << channel->getName() << std::endl;
+    std::cout << "Users in channel: " << channel->getUserCount() << std::endl;
+}
+void CommandHandler::handlePrivmsg(Server& server, Client& client, const ParsedCommand& cmd)
+{
+    if (cmd.params.size() < 2)
+    {
+        server.sendMessage(client.getFd(), "PRIVMSG: not enough parameters\r\n");
+        return;
+    }
+
+    std::string target = cmd.params[0];
+    std::string message = cmd.params[1];
+
+    Channel* channel = server.findChannel(target);
+    if (!channel)
+    {
+        server.sendMessage(client.getFd(), "No such channel\r\n");
+        return;
+    }
+
+    if (!channel->hasUser(&client))
+    {
+        server.sendMessage(client.getFd(), "You are not in this channel\r\n");
+        return;
+    }
+
+    const std::vector<Client*>& users = channel->getUsers();
+
+    for (size_t i = 0; i < users.size(); i++)
+    {
+        if (users[i] != &client)
+        {
+            server.sendMessage(users[i]->getFd(),":" + client.getNickname() + " PRIVMSG " + target + " :" + message + "\r\n");
+        }
+    }
 }
