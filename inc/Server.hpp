@@ -2,8 +2,8 @@
 #define SERVER_HPP
 
 #include <vector>
+#include <list>
 #include <poll.h>
-#include "Client.hpp"
 #include <string>
 #include <iostream>
 #include <sys/types.h>
@@ -12,9 +12,15 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <errno.h>
-#include "CommandHandler.hpp"
 #include <netdb.h>
+
+#include "Client.hpp"
+#include "Parser.hpp"
+#include "CommandHandler.hpp"
+#include "Channel.hpp"
+
 class CommandHandler;
+
 class Server
 {
     private:
@@ -22,26 +28,41 @@ class Server
         std::string _pass;
         int _serverfd;
         std::vector<pollfd> _fds;
-        std::vector<Client> _clients;
+        std::list<Client> _clients;
+        std::vector<Channel> _channels;
         Parser _parsed;
         CommandHandler _handler;
+
         Client* findClient(int fd);
+        pollfd* findPollFd(int fd);
         void processBuffer(Client& client);
+        void flushClientOutput(int fd);
+        void removeClientFromChannels(Client* client);
+
     public:
-        Server(int port, std::string pass);
+        Server(int port, const std::string& pass);
         ~Server();
-        const std::string& getPass()const{return _pass;}
+
+        const std::string& getPass() const;
+
+        void initSocket();
+        void bindSocket();
+        void startListening();
+        void acceptClient();
+        void receiveData(int fd);
+        void run();
+
         void sendMessage(int fd, const std::string& msg);
-        bool isNickTaken(std::string& wanted);
-        void initSocket();        // socket + setsockopt
-        void bindSocket();        // bind()
-        void startListening();    // listen()
-        void acceptClient();      // accept()
-        void receiveData(int fd); // recv()
-        void removeClient(int fd);     // global cleanup
-        void removePollFd(int fd);         // remove from _fds
-        void removeClientObject(int fd);   // remove from _clients
-        void run();              // main loop
+
+        void removeClient(int fd);
+        void removePollFd(int fd);
+        void removeClientObject(int fd);
+
+        bool isNickTaken(const std::string& wanted, int exceptFd) const;
+        Client* findClientByNick(const std::string& nickname);
+
+        Channel* findChannel(const std::string& name);
+        Channel* createChannel(const std::string& name);
 };
 
 #endif

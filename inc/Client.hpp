@@ -3,37 +3,53 @@
 
 #include <string>
 #include <iostream>
+
 class Client
 {
     private:
-
         int _fd;
         std::string _buffer;
+        std::string _outputBuffer;
+
         // IRC identity
         std::string _nickname;
         std::string _username;
         std::string _realname;
+
         // Registration state
         bool _passAccepted;
         bool _hasNick;
         bool _hasUser;
         bool _registered;
-    public:
 
+    public:
         Client();
         Client(int fd);
         ~Client();
+
         int getFd() const;
-        void appendBuffer(std::string data);
-        std::string &getBuffer();
+
+        void appendBuffer(const std::string& data);
+        std::string& getBuffer();
         void clearBuffer();
-        /* getters and setters */
+
+        void appendOutput(const std::string& data);
+        std::string& getOutputBuffer();
+        bool hasPendingOutput() const;
+        void consumeOutput(size_t count);
+
         void setNickname(const std::string& nick);
         std::string& getNickname();
+        const std::string& getNickname() const;
+
         void setUsername(const std::string& user);
         std::string& getUsername();
+        const std::string& getUsername() const;
+
         void setRealname(const std::string& real);
         std::string& getRealname();
+        const std::string& getRealname() const;
+
         void setPassAccepted(bool value);
         bool passAccepted() const;
         void setHasNick(bool value);
