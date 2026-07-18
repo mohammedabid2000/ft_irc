@@ -11,12 +11,10 @@ class Client
         std::string _buffer;
         std::string _outputBuffer;
 
-        // IRC identity
         std::string _nickname;
         std::string _username;
         std::string _realname;
 
-        // Registration state
         bool _passAccepted;
         bool _hasNick;
         bool _hasUser;
