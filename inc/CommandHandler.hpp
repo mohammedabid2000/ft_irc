@@ -50,6 +50,10 @@ class CommandHandler
                         Client& client,
                         const ParsedCommand& cmd);
 
+        void handleBot(Server& server,
+                       Client& client,
+                       const std::string& text);
+
         void tryRegister(Server& server, Client& client);
         bool requireRegistered(Server& server, Client& client);
 };

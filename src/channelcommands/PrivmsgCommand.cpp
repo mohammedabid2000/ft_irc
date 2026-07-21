@@ -36,6 +36,12 @@ void CommandHandler::handlePrivmsg(Server& server,
     const std::string target = cmd.params[0];
     const std::string text = cmd.params[1];
 
+    if (ircCaseEqual(target, "Bot"))
+    {
+        handleBot(server, client, text);
+        return;
+    }
+
     const std::string message =
         clientPrefix(client.getNickname(), client.getUsername())
         + " PRIVMSG " + target + " :" + text + "\r\n";
