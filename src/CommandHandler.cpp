@@ -6,17 +6,12 @@
 #include <sstream>
 
 
-void CommandHandler::handlePass(Server& server,
-                                Client& client,
-                                const ParsedCommand& cmd)
+void CommandHandler::handlePass(Server& server, Client& client, const ParsedCommand& cmd)
 {
     if (client.isRegistered())
     {
-        server.sendMessage(
-            client.getFd(),
-            makeReply(ERR_ALREADYREGISTERED,
-                      client.getNickname(),
-                      "You may not reregister")
+        server.sendMessage(client.getFd(), makeReply(ERR_ALREADYREGISTERED,
+                      client.getNickname(),"You may not reregister")
         );
         return;
     }

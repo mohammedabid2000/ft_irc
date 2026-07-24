@@ -18,7 +18,7 @@
 #include "Parser.hpp"
 #include "CommandHandler.hpp"
 #include "Channel.hpp"
-
+#include "Utils.hpp"
 class CommandHandler;
 
 class Server
@@ -63,6 +63,8 @@ class Server
 
         Channel* findChannel(const std::string& name);
         Channel* createChannel(const std::string& name);
+        void removeChannelIfEmpty(const std::string& name);
+        void quitClient(Client& client, const std::string& reason);
 };
 
 #endif

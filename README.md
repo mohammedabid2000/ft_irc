@@ -23,8 +23,16 @@ The server uses a single `poll()` loop to handle all network events without usin
 ### Messaging
 
 - JOIN
+<<<<<<< ours
 - PRIVMSG (user ↔ user)
 - PRIVMSG (channel)
+=======
+- PART
+- QUIT
+- PRIVMSG (user ↔ user)
+- PRIVMSG (channel)
+- DCC file-transfer negotiation (SEND, RESUME, ACCEPT)
+>>>>>>> theirs
 
 ### Channel operators
 
@@ -108,6 +116,16 @@ Create or join a channel:
 JOIN #general
 ```
 
+<<<<<<< ours
+=======
+Leave a channel or disconnect from the server:
+
+```text
+PART #general :Leaving the channel
+QUIT :Goodbye
+```
+
+>>>>>>> theirs
 Send a message:
 
 ```text
@@ -204,4 +222,8 @@ Every suggestion was reviewed, adapted, compiled, and tested before being integr
 ## Authors
 
 - **mohabid**
+<<<<<<< ours
 - **sihfadil**
+=======
+- **sihfadil**
+>>>>>>> theirs

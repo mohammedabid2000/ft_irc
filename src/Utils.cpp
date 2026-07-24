@@ -61,3 +61,25 @@ std::string clientPrefix(const std::string& nickname,
 {
     return ":" + nickname + "!" + username + "@localhost";
 }
+
+bool isValidPort(const char* value, int& port)
+{
+    if (!value || !value[0])
+        return false;
+
+    for (size_t i = 0; value[i]; ++i)
+    {
+        if (value[i] < '0' || value[i] > '9')
+            return false;
+    }
+
+    errno = 0;
+    char* end = NULL;
+    long number = std::strtol(value, &end, 10);
+    if (errno != 0 || !end || *end != '\0')
+        return false;
+    if (number < 1 || number > 65535)
+        return false;
+    port = static_cast<int>(number);
+    return true;
+}

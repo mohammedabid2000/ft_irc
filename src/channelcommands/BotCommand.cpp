@@ -109,7 +109,7 @@ void CommandHandler::handleBot(Server& server,
         sendBotMessage(
             server,
             client,
-            "IRC commands: PASS, NICK, USER, JOIN, PRIVMSG, TOPIC, INVITE, KICK, MODE"
+            "IRC commands: PASS, NICK, USER, JOIN, PART, QUIT, PRIVMSG, TOPIC, INVITE, KICK, MODE"
         );
         return;
     }

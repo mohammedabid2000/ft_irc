@@ -30,9 +30,22 @@ class CommandHandler
                         Client& client,
                         const ParsedCommand& cmd);
 
+        void handlePart(Server& server,
+                        Client& client,
+                        const ParsedCommand& cmd);
+
+        void handleQuit(Server& server,
+                        Client& client,
+                        const ParsedCommand& cmd);
+
         void handlePrivmsg(Server& server,
                            Client& client,
                            const ParsedCommand& cmd);
+
+        bool handleFileTransfer(Server& server,
+                                Client& client,
+                                const std::string& target,
+                                const std::string& text);
 
         void handleTopic(Server& server,
                          Client& client,

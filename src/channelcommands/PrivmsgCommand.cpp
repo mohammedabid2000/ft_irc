@@ -42,6 +42,9 @@ void CommandHandler::handlePrivmsg(Server& server,
         return;
     }
 
+    if (handleFileTransfer(server, client, target, text))
+        return;
+
     const std::string message =
         clientPrefix(client.getNickname(), client.getUsername())
         + " PRIVMSG " + target + " :" + text + "\r\n";

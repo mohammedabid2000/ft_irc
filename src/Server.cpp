@@ -157,6 +157,8 @@ void Server::receiveData(int fd)
         {
             client->appendBuffer(std::string(buffer, static_cast<size_t>(bytes)));
             processBuffer(*client);
+            if (!findClient(fd))
+                return;
             continue;
         }
         if (bytes == 0)
@@ -191,7 +193,10 @@ void Server::processBuffer(Client& client)
             continue;
 
         ParsedCommand command = _parsed.parse(line);
+        const int fd = client.getFd();
         _handler.execute(*this, client, command);
+        if (!findClient(fd))
+            return;
     }
 }
 
@@ -391,4 +396,56 @@ Channel* Server::createChannel(const std::string& name)
 {
     _channels.push_back(Channel(name));
     return &_channels.back();
+}
+
+void Server::removeChannelIfEmpty(const std::string& name)
+{
+    for (size_t i = 0; i < _channels.size(); ++i)
+    {
+        if (ircCaseEqual(_channels[i].getName(), name)
+            && _channels[i].getUserCount() == 0)
+        {
+            _channels.erase(_channels.begin() + i);
+            return;
+        }
+    }
+}
+
+void Server::quitClient(Client& client, const std::string& reason)
+{
+    std::vector<Client*> recipients;
+
+    for (size_t i = 0; i < _channels.size(); ++i)
+    {
+        if (!_channels[i].hasUser(&client))
+            continue;
+
+        const std::vector<Client*>& members = _channels[i].getUsers();
+        for (size_t j = 0; j < members.size(); ++j)
+        {
+            if (members[j] == &client)
+                continue;
+
+            bool alreadyAdded = false;
+            for (size_t k = 0; k < recipients.size(); ++k)
+            {
+                if (recipients[k] == members[j])
+                {
+                    alreadyAdded = true;
+                    break;
+                }
+            }
+            if (!alreadyAdded)
+                recipients.push_back(members[j]);
+        }
+    }
+
+    const std::string quitMessage =
+        clientPrefix(client.getNickname(), client.getUsername())
+        + " QUIT :" + reason + "\r\n";
+
+    for (size_t i = 0; i < recipients.size(); ++i)
+        sendMessage(recipients[i]->getFd(), quitMessage);
+
+    removeClient(client.getFd());
 }

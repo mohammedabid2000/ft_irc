@@ -18,6 +18,10 @@ void CommandHandler::execute(Server& server,
         handleUser(server, client, cmd);
     else if (cmd.command == "JOIN")
         handleJoin(server, client, cmd);
+    else if (cmd.command == "PART")
+        handlePart(server, client, cmd);
+    else if (cmd.command == "QUIT")
+        handleQuit(server, client, cmd);
     else if (cmd.command == "PRIVMSG")
         handlePrivmsg(server, client, cmd);
     else if (cmd.command == "TOPIC")
