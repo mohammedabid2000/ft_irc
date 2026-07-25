@@ -23,16 +23,11 @@ The server uses a single `poll()` loop to handle all network events without usin
 ### Messaging
 
 - JOIN
-<<<<<<< ours
-- PRIVMSG (user ↔ user)
-- PRIVMSG (channel)
-=======
 - PART
 - QUIT
 - PRIVMSG (user ↔ user)
 - PRIVMSG (channel)
 - DCC file-transfer negotiation (SEND, RESUME, ACCEPT)
->>>>>>> theirs
 
 ### Channel operators
 
@@ -63,6 +58,11 @@ Supported channel modes:
 - Private messaging
 - IRC numeric replies
 - No external libraries
+
+### Bonus
+
+- Built-in IRC bot
+- DCC file-transfer negotiation for HexChat
 
 ---
 
@@ -116,8 +116,6 @@ Create or join a channel:
 JOIN #general
 ```
 
-<<<<<<< ours
-=======
 Leave a channel or disconnect from the server:
 
 ```text
@@ -125,7 +123,6 @@ PART #general :Leaving the channel
 QUIT :Goodbye
 ```
 
->>>>>>> theirs
 Send a message:
 
 ```text
@@ -164,11 +161,15 @@ src/
     channelcommands/
         RegistrationCheck.cpp
         JoinCommand.cpp
+        PartCommand.cpp
+        QuitCommand.cpp
         PrivmsgCommand.cpp
         TopicCommand.cpp
         InviteCommand.cpp
         KickCommand.cpp
         ModeCommand.cpp
+        BotCommand.cpp
+        FileTransferHandle.cpp
 
     Client.cpp
     CommandHandler.cpp
@@ -222,8 +223,4 @@ Every suggestion was reviewed, adapted, compiled, and tested before being integr
 ## Authors
 
 - **mohabid**
-<<<<<<< ours
 - **sihfadil**
-=======
-- **sihfadil**
->>>>>>> theirs
