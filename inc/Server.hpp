@@ -32,7 +32,7 @@ class Server
         std::vector<Channel> _channels;
         Parser _parsed;
         CommandHandler _handler;
-
+        
         Client* findClient(int fd);
         pollfd* findPollFd(int fd);
         void processBuffer(Client& client);
@@ -43,27 +43,24 @@ class Server
         Server(int port, const std::string& pass);
         ~Server();
 
-        const std::string& getPass() const;
-
+        
         void initSocket();
         void bindSocket();
         void startListening();
         void acceptClient();
         void receiveData(int fd);
         void run();
-
+        
+        const std::string& getPass() const;
         void sendMessage(int fd, const std::string& msg);
-
-        void removeClient(int fd);
-        void removePollFd(int fd);
-        void removeClientObject(int fd);
-
         bool isNickTaken(const std::string& wanted, int exceptFd) const;
         Client* findClientByNick(const std::string& nickname);
-
         Channel* findChannel(const std::string& name);
         Channel* createChannel(const std::string& name);
         void removeChannelIfEmpty(const std::string& name);
+        void removeClientObject(int fd);
+        void removePollFd(int fd);
+        void removeClient(int fd);
         void quitClient(Client& client, const std::string& reason);
 };
 

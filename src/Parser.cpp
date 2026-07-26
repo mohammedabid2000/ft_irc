@@ -4,16 +4,13 @@
 ParsedCommand Parser::parse(const std::string& line)
 {
     ParsedCommand cmd;
+    
     size_t pos = 0;
-
     while (pos < line.size() && line[pos] == ' ')
         ++pos;
-
     size_t space = line.find(' ', pos);
     if (space == std::string::npos)
-    {
         cmd.command = line.substr(pos);
-    }
     else
     {
         cmd.command = line.substr(pos, space - pos);

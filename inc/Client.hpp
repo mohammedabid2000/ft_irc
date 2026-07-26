@@ -47,7 +47,7 @@ class Client
         void setRealname(const std::string& real);
         std::string& getRealname();
         const std::string& getRealname() const;
-
+        /*registration and authentification for our client*/
         void setPassAccepted(bool value);
         bool passAccepted() const;
         void setHasNick(bool value);

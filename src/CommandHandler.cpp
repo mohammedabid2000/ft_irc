@@ -3,9 +3,6 @@
 #include "../inc/Macro.hpp"
 #include "../inc/Utils.hpp"
 
-#include <sstream>
-
-
 void CommandHandler::handlePass(Server& server, Client& client, const ParsedCommand& cmd)
 {
     if (client.isRegistered())
