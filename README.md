@@ -175,6 +175,7 @@ src/
     CommandHandler.cpp
     Parser.cpp
     Server.cpp
+    Server_op.cpp
     Utils.cpp
     main.cpp
 ```

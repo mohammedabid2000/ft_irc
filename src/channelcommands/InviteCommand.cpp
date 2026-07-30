@@ -11,7 +11,7 @@ void CommandHandler::handleInvite(Server& server,
     if (!requireRegistered(server, client))
         return;
 
-    if (cmd.params.size() < 2)
+    if (cmd.params.size() != 2)
     {
         server.sendMessage(
             client.getFd(),

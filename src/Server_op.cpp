@@ -234,6 +234,5 @@ void Server::quitClient(Client& client, const std::string& reason)
 
 	for (size_t i = 0; i < recipients.size(); ++i)
 		sendMessage(recipients[i]->getFd(), quitMessage);
-
 	removeClient(client.getFd());
 }
