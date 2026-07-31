@@ -6,9 +6,7 @@ void CommandHandler::handleQuit(Server& server,
                                 const ParsedCommand& cmd)
 {
     std::string reason = "Client Quit";
-
     if (!cmd.params.empty() && !cmd.params[0].empty())
         reason = cmd.params[0];
-
     server.quitClient(client, reason);
 }

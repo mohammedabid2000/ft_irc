@@ -40,9 +40,7 @@ void Server::initSocket()
         _serverfd = -1;
         return;
     }
-
-    int flags = fcntl(_serverfd, F_GETFL, 0);
-    if (flags < 0 || fcntl(_serverfd, F_SETFL, flags | O_NONBLOCK) < 0)
+    if (fcntl(_serverfd, F_SETFL, O_NONBLOCK) < 0)
     {
         std::cerr << "fcntl failed for listening socket" << std::endl;
         close(_serverfd);
@@ -94,8 +92,7 @@ void Server::acceptClient()
             std::cerr << "accept failed" << std::endl;
             return;
         }
-        int flags = fcntl(clientFd, F_GETFL, 0);
-        if (flags < 0 || fcntl(clientFd, F_SETFL, flags | O_NONBLOCK) < 0)
+        if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
         {
             std::cerr << "fcntl failed for client socket" << std::endl;
             close(clientFd);
