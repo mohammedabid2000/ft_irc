@@ -61,6 +61,7 @@ class Server
         void removeClientObject(int fd);
         void removePollFd(int fd);
         void removeClient(int fd);
+        void broadcastNickChange(Client& client, const std::string& oldNick, const std::string& newNick);
         void quitClient(Client& client, const std::string& reason);
 };
 

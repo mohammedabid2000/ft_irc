@@ -200,6 +200,48 @@ void Server::removeClient(int fd)
     removeClientObject(fd);
     std::cout << "REMOVE fd = " << fd << std::endl;
 }
+void Server::broadcastNickChange(Client& client,
+                                 const std::string& oldNick,
+                                 const std::string& newNick)
+{
+    std::vector<Client*> recipients;
+    recipients.push_back(&client);
+    for (size_t i = 0; i < _channels.size(); ++i)
+    {
+        if (!_channels[i].hasUser(&client))
+            continue;
+
+        const std::vector<Client*>& members =
+            _channels[i].getUsers();
+
+        for (size_t j = 0; j < members.size(); ++j)
+        {
+            bool alreadyAdded = false;
+            for (size_t k = 0; k < recipients.size(); ++k)
+            {
+                if (recipients[k] == members[j])
+                {
+                    alreadyAdded = true;
+                    break;
+                }
+            }
+
+            if (!alreadyAdded)
+                recipients.push_back(members[j]);
+        }
+    }
+
+    const std::string message =
+        clientPrefix(oldNick, client.getUsername())
+        + " NICK :" + newNick + "\r\n";
+
+    for (size_t i = 0; i < recipients.size(); ++i)
+    {
+        if(recipients[i]->getFd() == client.getFd())
+            continue;
+        sendMessage(recipients[i]->getFd(), message);
+    }
+}
 
 void Server::quitClient(Client& client, const std::string& reason)
 {

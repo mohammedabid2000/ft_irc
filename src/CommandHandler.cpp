@@ -102,17 +102,9 @@ void CommandHandler::handleNick(Server& server,
     client.setHasNick(true);
 
     if (client.isRegistered())
-    {
-        server.sendMessage(
-            client.getFd(),
-            clientPrefix(oldNick, client.getUsername())
-            + " NICK :" + newNick + "\r\n"
-        );
-    }
+        server.broadcastNickChange(client, oldNick, newNick);
     else
-    {
         tryRegister(server, client);
-    }
 }
 
 void CommandHandler::handleUser(Server& server,
