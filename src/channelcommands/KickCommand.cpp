@@ -101,4 +101,5 @@ void CommandHandler::handleKick(Server& server,
         server.sendMessage(members[i]->getFd(), kickMessage);
 
     channel->removeUser(kickedClient);
+    server.removeChannelIfEmpty(channelName);
 }

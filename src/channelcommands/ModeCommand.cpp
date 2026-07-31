@@ -241,18 +241,20 @@ void CommandHandler::handleMode(Server& server,
 
                 argument = cmd.params[parameterIndex];
                 ++parameterIndex;
-
-                std::istringstream limitStream(argument);
-                size_t limit;
-                char remainingCharacter;
-
-                if (!(limitStream >> limit)
-                    || limit == 0
-                    || (limitStream >> remainingCharacter))
+                bool validLimit = !argument.empty();
+                for (size_t characterIndex = 0; characterIndex < argument.size(); ++characterIndex)
                 {
-                    continue;
+                    if (argument[characterIndex] < '0'|| argument[characterIndex] > '9')
+                    {
+                        validLimit = false;
+                        break;
+                    }
                 }
-
+                std::istringstream limitStream(argument);
+                size_t limit = 0;
+                char remainingCharacter;
+                if (!validLimit || !(limitStream >> limit) || limit == 0 || (limitStream >> remainingCharacter))
+                    continue;
                 channel->setUserLimit(limit);
                 modeChanged = true;
             }
